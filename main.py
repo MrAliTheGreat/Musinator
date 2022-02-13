@@ -1,20 +1,30 @@
 import discord
+from discord.ext import commands
 import os
 
-client = discord.Client()
+musinator = commands.Bot(command_prefix = ".")
 
-@client.event
+@musinator.event
 async def on_ready():
   print("Musinator is live!")
 
+@musinator.command()
+async def test(ctx):
+  await ctx.send("Test Response!")
 
-@client.event
-async def on_message(message):
-  if(message.author is client.user):
-    return
+@musinator.command()
+async def join(ctx):
+  if(ctx.author.voice):
+    await ctx.author.voice.channel.connect()
+  else:
+    await ctx.send("You are not currently in a channel!")
 
-  if(message.content.startswith("-test")):
-    await message.channel.send("I'm OK!")
+@musinator.command()
+async def leave(ctx):
+  if(ctx.voice_client):
+    await ctx.voice_client.disconnect()
+  else:
+    await ctx.send("I'm not in any voice channel!")
+  
 
-
-client.run(os.environ["DISCORD_TOKEN"]) # Environment Variable is on repl.it
+musinator.run(os.environ["DISCORD_TOKEN"])
