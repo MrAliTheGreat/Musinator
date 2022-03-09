@@ -1,7 +1,6 @@
 import asyncio
 import discord
 from discord.ext import commands
-from matplotlib.pyplot import disconnect
 import youtube_dl
 from dotenv import load_dotenv
 import os
