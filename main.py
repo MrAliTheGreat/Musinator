@@ -1,6 +1,7 @@
 import asyncio
 import discord
 from discord.ext import commands
+from matplotlib.pyplot import disconnect
 import youtube_dl
 from dotenv import load_dotenv
 import os
@@ -20,7 +21,7 @@ FFmpeg_options = {
   'options': '-vn'
 }
 
-musinator = commands.Bot(command_prefix = ".")
+musinator = commands.Bot(command_prefix = "-")
 
 
 def convertToTimeFormat(seconds):
@@ -38,6 +39,17 @@ def playNextSongInQueue(ctx):
       musinator.loop
     )
     del song_queue[0]
+
+def getAudio(musicTitle):
+  with youtube_dl.YoutubeDL(youtubeDL_options) as ydl:
+    info = ydl.extract_info("ytsearch:" + musicTitle, download = False)["entries"][0]
+    audioSource = discord.PCMVolumeTransformer(
+      discord.FFmpegPCMAudio(
+        source = info["url"], **FFmpeg_options
+      )
+    )
+  
+  return audioSource, info
 
 
 @musinator.event
@@ -64,7 +76,7 @@ async def join(ctx):
 async def leave(ctx):
   if(ctx.voice_client):
     await ctx.voice_client.disconnect()
-    song_queue = []
+    song_queue.clear()
   else:
     await ctx.send("I'm not in any voice channel!")
 
@@ -74,21 +86,15 @@ async def play(ctx, *, musicTitle):
     await ctx.send("I'm not currently in a voice channel!")
     return
 
-  with youtube_dl.YoutubeDL(youtubeDL_options) as ydl:
-    info = ydl.extract_info("ytsearch:" + musicTitle, download = False)["entries"][0]
-    audioSource = discord.PCMVolumeTransformer(
-      discord.FFmpegPCMAudio(
-        source = info["url"], **FFmpeg_options
-      )
-    )
+  audioSource, info = getAudio(musicTitle)
 
-    if(ctx.voice_client.is_playing() or len(song_queue) > 0):
-      song_queue.append([ audioSource, info["title"], info["duration"] ])
-      await ctx.send("Song " + info["title"] + " was added to the queue")
-      return
-    
-    ctx.voice_client.play(audioSource, after = lambda _ : playNextSongInQueue(ctx))
-    await ctx.send("Playing " + info["title"] + "  |   Duration: " + convertToTimeFormat(info["duration"]) )
+  if(ctx.voice_client.is_playing() or len(song_queue) > 0):
+    song_queue.append([ audioSource, info["title"], info["duration"] ])
+    await ctx.send("Song " + info["title"] + " was added to the queue")
+    return
+  
+  ctx.voice_client.play(audioSource, after = lambda _ : playNextSongInQueue(ctx))
+  await ctx.send("Playing " + info["title"] + "  |   Duration: " + convertToTimeFormat(info["duration"]) )
 
 @musinator.command()
 async def queue(ctx):
@@ -101,6 +107,31 @@ async def queue(ctx):
     await ctx.send(title + "   |   " + convertToTimeFormat(duration) )
 
 @musinator.command()
+async def endingRitual(ctx):
+  if(not ctx.voice_client):
+    await ctx.send("I'm not currently in a voice channel!")
+    return
+
+  audioSource, info = getAudio("Mahtab Vigen")
+
+  song_queue.clear()
+  if(ctx.voice_client.is_playing()):
+    ctx.voice_client.stop()
+
+  ctx.voice_client.play(
+    audioSource,
+    after = lambda _ : asyncio.run_coroutine_threadsafe(
+      ctx.voice_client.disconnect(),
+      musinator.loop
+    )
+  )
+  await ctx.send(
+    "Cleared The Queue\n" + 
+    "Playing " + info["title"] + "  |   Duration: " + convertToTimeFormat(info["duration"]) + "\n"
+    "Before Ending The Call!"
+  )
+
+@musinator.command()
 async def pause(ctx):
   ctx.voice_client.pause()
 
@@ -111,7 +142,7 @@ async def skip(ctx):
 @musinator.command()
 async def resume(ctx):
   ctx.voice_client.resume()
-
+  
 
 
 musinator.run(os.environ.get("DISCORD_TOKEN"))
