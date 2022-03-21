@@ -35,3 +35,7 @@ Python code of a Discord bot created for playing music in Discord voice chat.
 
 **-endingRitual**:
    - Musinator will clear the queue, stop the current song and play Mahtab by Vigen before leaving the voice chat it is in
+
+**-video [Video Name]**:
+   - Musinator will download the video mentioned by the user to the local drive, upload the video to the chat so that everyone can watch it and finally delete the downloaded video from local drive
+   - There is no video streaming for bots on Discord so that's the reason for downloading, uploading and deleting the video
