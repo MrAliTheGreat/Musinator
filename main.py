@@ -5,6 +5,8 @@ import youtube_dl
 from dotenv import load_dotenv
 import os
 
+from videoHandler import fetchVideo
+
 
 load_dotenv()
 
@@ -129,6 +131,18 @@ async def endingRitual(ctx):
     "Playing " + info["title"] + "  |   Duration: " + convertToTimeFormat(info["duration"]) + "\n"
     "Before Ending The Call!"
   )
+
+@musinator.command()
+async def video(ctx, *, videoTitle):
+  videoPath, videoName = fetchVideo(videoTitle)
+  await ctx.send(
+    "Video Downloaded!\nUploading to Discord..."
+  )
+  await ctx.send(
+    "-----  " + videoName + "  -----",
+    file = discord.File(videoPath)
+  )
+  os.remove(videoPath)
 
 @musinator.command()
 async def pause(ctx):
