@@ -5,7 +5,7 @@ import youtube_dl
 from dotenv import load_dotenv
 import os
 
-from videoHandler import fetchVideo
+from videoHandler import convertToWebM, fetchVideo
 
 
 load_dotenv()
@@ -136,7 +136,18 @@ async def endingRitual(ctx):
 async def video(ctx, *, videoTitle):
   videoPath, videoName = fetchVideo(videoTitle)
   await ctx.send(
-    "Video Downloaded!\nUploading to Discord..."
+    "Video Downloaded!"
+  )
+  if(videoPath[-4:] != "webm"):
+    await ctx.send(
+      "Converting to WebM..."
+    )
+    videoPath = convertToWebM(videoPath)
+    await ctx.send(
+      "WebM Created!"
+    )
+  await ctx.send(
+    "Uploading to Discord..."
   )
   await ctx.send(
     "-----  " + videoName + "  -----",

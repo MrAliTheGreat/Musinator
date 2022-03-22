@@ -3,10 +3,12 @@ import os
 from moviepy.editor import VideoFileClip
 
 
-
+yt_dlp_downloadFilePath = "./video"
+webmFileName = "webmVideo"
 yt_dlp_options = {
     "format" : "bestvideo[filesize<=6M]+bestaudio[filesize<=2M]",
-    "noplaylist" : True
+    "noplaylist" : True,
+    "outtmpl" : yt_dlp_downloadFilePath + ".%(ext)s"
 }
 
 # Not useful here because gif is much larger in size than the video itself
@@ -22,8 +24,20 @@ def convertVideoToGif(videoPath):
 
     return "./gifVersion.gif"
 
+# -crf can be changed to 55 just to be sure filesize won't go past 8MB
+def convertToWebM(videoPath):
+    os.system('ffmpeg -i "' + videoPath + '" -c:v libvpx -b:v 0 -crf 50 "' + webmFileName + '.webm"')
+    os.remove(videoPath)
+    return "./" + webmFileName + ".webm"
+
 def fetchVideo(videoTitle):
     with yt_dlp.YoutubeDL(yt_dlp_options) as ydl:
         videoInfo = ydl.extract_info("ytsearch:" + videoTitle, download = True)["entries"][0]
-        videoFileName = ydl.prepare_filename(videoInfo)
-    return "./" + videoFileName, videoInfo["title"]
+    
+    if(os.path.isfile(yt_dlp_downloadFilePath + '.mkv')):
+        return yt_dlp_downloadFilePath + '.mkv', videoInfo["title"]
+    
+    elif(os.path.isfile(yt_dlp_downloadFilePath + '.mp4')):
+        return yt_dlp_downloadFilePath + '.mp4', videoInfo["title"]
+    
+    return yt_dlp_downloadFilePath + '.webm', videoInfo["title"] 
