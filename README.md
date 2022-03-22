@@ -39,3 +39,4 @@ Python code of a Discord bot created for playing music in Discord voice chat.
 **-video [Video Name]**:
    - Musinator will download the video mentioned by the user to the local drive, upload the video to the chat so that everyone can watch it and finally delete the downloaded video from local drive
    - There is no video streaming for bots on Discord so that's the reason for downloading, uploading and deleting the video
+   - Discord has 8MB file size limit so playing long videos in an acceptable form won't be easy to achieve. Playing music videos or short videos around 5 minutes is recommended for getting the best results.
