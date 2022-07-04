@@ -26,7 +26,7 @@ def convertVideoToGif(videoPath):
 
 # -crf can be changed to 55 just to be sure filesize won't go past 8MB
 def convertToWebM(videoPath):
-    os.system('ffmpeg -i "' + videoPath + '" -c:v libvpx -b:v 0 -crf 50 "' + webmFileName + '.webm"')
+    os.system('ffmpeg -i "' + videoPath + '" -c:v libvpx -b:v 0 -crf 55 "' + webmFileName + '.webm"')
     os.remove(videoPath)
     return "./" + webmFileName + ".webm"
 
