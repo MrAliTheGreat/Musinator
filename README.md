@@ -44,7 +44,7 @@ Python code of a Discord bot created for playing music in Discord voice chat.
 ### Upcoming Features:
    - Voice recognition for commands
    - Showing lyrics of the currently playing song
-      - 1. Using Youtube-dl's data
-      - 2. Using an API
-      - 3. Musinator's speech to text
+      - Using Youtube-dl's data
+      - Using an API
+      - Musinator's speech to text
    - Kicking everyone from the call after endingRitual
