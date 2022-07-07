@@ -118,7 +118,7 @@ async def endingRitual(ctx):
   song_queue.clear()
   if(ctx.voice_client.is_playing()):
     ctx.voice_client.stop()
-
+  
   ctx.voice_client.play(
     audioSource,
     after = lambda _ : asyncio.run_coroutine_threadsafe(
@@ -154,6 +154,12 @@ async def video(ctx, *, videoTitle):
     file = discord.File(videoPath)
   )
   os.remove(videoPath)
+
+@musinator.command()
+async def listen(ctx):
+  # TO DO
+  # As of right now discord.py does not support receiving audio!
+  pass
 
 @musinator.command()
 async def pause(ctx):
